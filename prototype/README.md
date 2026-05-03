@@ -2,7 +2,7 @@
 
 Post-signature **portfolio-level contract intelligence** built for the Senior AI Product Manager take-home exercise. Everything runs locally - no secrets, no live LLM dependency (interaction patterns are simulated with deterministic data and provenance popovers).
 
-> **Companion document:** `../case-study.html` is the paired product memo. The prototype is the implementation of the solution overview in §02 of that document.
+> **Companion document:** `../case-study.html` is the paired product memo. The prototype is the implementation of the solution overview in Section 02 of that document.
 
 ---
 
