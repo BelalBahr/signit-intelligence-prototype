@@ -22,6 +22,8 @@ npm run dev        # http://localhost:5173 -> lands on Obligation Timeline
 
 Node 20+ recommended. Full instructions, scenario walkthroughs, simulated-vs-live matrix, and demo-only button list live in [`prototype/README.md`](./prototype/README.md).
 
+**Product documentation** (vision, IA, surfaces, trust model, data concepts): [`docs/PRODUCT_DOCUMENTATION.md`](./docs/PRODUCT_DOCUMENTATION.md).
+
 ---
 
 ## Read the case study
@@ -40,6 +42,8 @@ Open [`case-study.html`](./case-study.html) directly in a browser - it is a sing
 ```
 Signit/
   case-study.html                       # Product memo (open in browser)
+  docs/
+    PRODUCT_DOCUMENTATION.md            # Product spec for reviewers (IA, flows, trust model)
   Senior AI Product Manager - Signit.pdf
   prototype/
     src/                                # React + TS source
