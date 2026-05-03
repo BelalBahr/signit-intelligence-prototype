@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, TrendingDown, AlertTriangle, Zap, ChevronRight, Shield, FileText, Calendar } from 'lucide-react';
 import { executiveBrief, contracts, vendorIntelligence, personas } from '../data/contracts';
@@ -18,15 +19,42 @@ function KpiCard({ label, value, delta, positive }: { label: string; value: stri
   );
 }
 
-function HighlightCard({ item }: { item: typeof executiveBrief.highlights[0] }) {
+function highlightRouteLabel(path: string): string {
+  if (path.startsWith('/contract/')) return 'contract';
+  if (path === '/legal') return 'PDPL sweep';
+  if (path === '/procurement') return 'procurement';
+  if (path === '/timeline') return 'obligation timeline';
+  return 'details';
+}
+
+function HighlightCard({ item, onNavigate }: { item: typeof executiveBrief.highlights[0]; onNavigate: (to: string) => void }) {
   const cfg = {
     risk: { Icon: AlertTriangle, bg: '#fef2f2', border: '#fecaca', iconColor: '#dc2626', label: 'Risk', labelBg: '#fef2f2', labelColor: '#b91c1c' },
     opportunity: { Icon: TrendingUp, bg: '#f0fdf4', border: '#bbf7d0', iconColor: '#16a34a', label: 'Opportunity', labelBg: '#f0fdf4', labelColor: '#15803d' },
     action: { Icon: Zap, bg: '#eef2ff', border: '#c7d2fe', iconColor: '#4338ca', label: 'Action Required', labelBg: '#eef2ff', labelColor: '#4338ca' },
   }[item.type];
 
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 16px', borderRadius: 10, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+  const to = item.deeplink;
+  const label = to ? `Open ${highlightRouteLabel(to)}` : undefined;
+
+  const rowStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 14,
+    padding: '14px 16px',
+    borderRadius: 10,
+    background: cfg.bg,
+    border: `1px solid ${cfg.border}`,
+    width: '100%',
+    textAlign: 'left',
+    cursor: to ? 'pointer' : 'default',
+    font: 'inherit',
+    boxSizing: 'border-box',
+    transition: 'background 0.12s, border-color 0.12s, box-shadow 0.12s',
+  };
+
+  const body = (
+    <>
       <div style={{ width: 32, height: 32, borderRadius: 8, background: '#fff', border: `1px solid ${cfg.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <cfg.Icon size={14} color={cfg.iconColor} strokeWidth={2} />
       </div>
@@ -42,8 +70,34 @@ function HighlightCard({ item }: { item: typeof executiveBrief.highlights[0] }) 
         <p style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 3 }}>{item.title}</p>
         <p style={{ fontSize: 12, color: '#52525b', lineHeight: 1.6 }}>{item.detail}</p>
       </div>
-    </div>
+      {to && (
+        <ChevronRight size={18} color="#a1a1aa" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden />
+      )}
+    </>
   );
+
+  if (to) {
+    return (
+      <button
+        type="button"
+        title={label}
+        onClick={() => onNavigate(to)}
+        style={rowStyle}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = item.type === 'risk' ? '#fee2e2' : item.type === 'opportunity' ? '#dcfce7' : '#e0e7ff';
+          e.currentTarget.style.boxShadow = '0 1px 4px rgb(24 24 27 / 0.06)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = cfg.bg;
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return <div style={rowStyle}>{body}</div>;
 }
 
 export default function Executive() {
@@ -97,7 +151,7 @@ export default function Executive() {
               </span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {brief.highlights.map((h, i) => <HighlightCard key={i} item={h} />)}
+              {brief.highlights.map((h, i) => <HighlightCard key={i} item={h} onNavigate={navigate} />)}
             </div>
           </Card>
 
@@ -211,19 +265,43 @@ export default function Executive() {
           <Card style={{ padding: 18 }}>
             <SectionLabel>Recommended Actions</SectionLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[
-                { label: 'Initiate Microsoft renegotiation', due: 'By Sep 2026', p: 'High' },
-                { label: 'Issue STC co-location RFP', due: 'Aug 2026', p: 'High' },
-                { label: 'Remediate STC PDPL Clause 14.1', due: 'Immediate', p: 'Critical' },
-                { label: 'Review Hays HR data transfers', due: 'This week', p: 'Critical' },
-              ].map((a, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', borderRadius: 8, background: '#fafafa', border: '1px solid #f4f4f5' }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: a.p === 'Critical' ? '#dc2626' : '#d97706', flexShrink: 0, marginTop: 5 }} />
-                  <div>
+              {(brief.recommendedActions ?? []).map((a, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  title={`Open ${highlightRouteLabel(a.to)}`}
+                  onClick={() => navigate(a.to)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    background: '#fafafa',
+                    border: '1px solid #f4f4f5',
+                    width: '100%',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    font: 'inherit',
+                    boxSizing: 'border-box',
+                    transition: 'background 0.12s, border-color 0.12s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = '#f4f4f5';
+                    e.currentTarget.style.borderColor = '#e4e4e7';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.borderColor = '#f4f4f5';
+                  }}
+                >
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: a.priority === 'Critical' ? '#dc2626' : '#d97706', flexShrink: 0, marginTop: 5 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#18181b' }}>{a.label}</p>
                     <p style={{ fontSize: 11, color: '#a1a1aa', marginTop: 1 }}>{a.due}</p>
                   </div>
-                </div>
+                  <ChevronRight size={16} color="#d4d4d8" style={{ flexShrink: 0, marginTop: 2 }} aria-hidden />
+                </button>
               ))}
             </div>
           </Card>

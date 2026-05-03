@@ -79,7 +79,15 @@ export interface ExecutiveBrief {
   criticalPdpl: number;
   potentialSavings: number;
   renewalOpportunities: number;
-  highlights: { type: 'risk' | 'opportunity' | 'action'; title: string; detail: string; value?: string }[];
+  highlights: {
+    type: 'risk' | 'opportunity' | 'action';
+    title: string;
+    detail: string;
+    value?: string;
+    /** In-app route (prototype) opened when the row is activated */
+    deeplink?: string;
+  }[];
+  recommendedActions?: { label: string; due: string; priority: 'Critical' | 'High'; to: string }[];
   kpis: { label: string; value: string; delta: string; positive: boolean }[];
 }
 
@@ -1017,31 +1025,42 @@ export const executiveBrief = {
       title: 'STC PDPL Breach Notification Non-Compliant',
       detail: 'STC Co-location Clause 14.1 requires 30-day notification vs. PDPL 72-hour mandate. Escalated to Legal Director. Vendor engagement required before renewal.',
       value: 'SAR 3.1M at risk',
+      deeplink: '/legal',
     },
     {
       type: 'risk' as const,
       title: 'Hays HR Data Transfer Violations',
       detail: 'Candidate data routed to US and UK without SDAIA safeguards. 3 PDPL clauses flagged (2 critical) in active recruitment contract serving 240 Saudization hires.',
       value: '2 critical violations',
+      deeplink: '/contract/c-006',
     },
     {
       type: 'opportunity' as const,
       title: 'Microsoft Azure - SAR 480K Saving Opportunity',
       detail: 'Contract renews Jan 2027. Current rate 22% above market median. stc Cloud pilot provides credible BATNA. Recommended: initiate renegotiation by Sep 2026.',
       value: 'SAR 480K / year',
+      deeplink: '/contract/c-001',
     },
     {
       type: 'opportunity' as const,
       title: 'STC Co-location Competitive RFP',
       detail: 'Mobily Business and Zain KSA offer KSA-compliant alternatives at SAR 2.2–2.6M. Running RFP 60 days before expiry recommended.',
       value: 'SAR 450K saving',
+      deeplink: '/contract/c-005',
     },
     {
       type: 'action' as const,
       title: 'Four Contracts Expiring Before Year-End',
       detail: 'Office Supplies (Jun), Travel Management (Aug), STC Co-location (Nov), HR RPO (Dec). Renewal decisions and RFPs required across all four.',
       value: 'SAR 6.5M in renewals',
+      deeplink: '/timeline',
     },
+  ],
+  recommendedActions: [
+    { label: 'Initiate Microsoft renegotiation', due: 'By Sep 2026', priority: 'High', to: '/contract/c-001' },
+    { label: 'Issue STC co-location RFP', due: 'Aug 2026', priority: 'High', to: '/procurement' },
+    { label: 'Remediate STC PDPL Clause 14.1', due: 'Immediate', priority: 'Critical', to: '/legal' },
+    { label: 'Review Hays HR data transfers', due: 'This week', priority: 'Critical', to: '/contract/c-006' },
   ],
   kpis: [
     { label: 'Portfolio Value', value: 'SAR 19.2M', delta: '+8.3% YoY', positive: true },
