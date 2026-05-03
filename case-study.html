@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Signature Contract Intelligence - Signit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+      --accent-light: #f3f4f6;
+      --max-w: 760px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .wrapper {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Cover */
+    .cover {
+      padding: 80px 0 60px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+    .cover-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .cover h1 {
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .cover-meta {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .cover-meta span + span::before { content: '\B7'; margin-right: 24px; color: var(--border); }
+    .cover-desc {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--accent-light);
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin-bottom: 64px;
+    }
+    .toc-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .toc ol {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      counter-reset: toc;
+    }
+    .toc li { counter-increment: toc; }
+    .toc a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 13.5px;
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      padding: 2px 0;
+    }
+    .toc a:hover { color: var(--muted); }
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 22px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 72px;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-width: 26px;
+    }
+    .section h2 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    /* Typography */
+    p { margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    h3 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 28px 0 10px;
+    }
+    h3:first-child { margin-top: 0; }
+
+    ul, ol {
+      padding-left: 20px;
+      margin-bottom: 14px;
+    }
+    ul { list-style: disc; }
+    li { margin-bottom: 6px; }
+    li:last-child { margin-bottom: 0; }
+
+    strong { font-weight: 600; }
+    em { font-style: italic; }
+
+    /* Callout */
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: var(--accent-light);
+      border-radius: 0 4px 4px 0;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    /* Figure */
+    .figure { margin: 28px 0; }
+    .figure-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0 48px;
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Print */
+    @media print {
+      .toc { display: none; }
+      .section { page-break-inside: avoid; }
+      body { font-size: 13px; }
+      .cover { padding: 40px 0 32px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-label">Senior AI Product Manager Assignment</div>
+    <h1>Post-Signature Contract Intelligence</h1>
+    <div class="cover-meta">
+      <span><strong>Belal Bahr</strong></span>
+      <span>Signit</span>
+      <span>May 3, 2026</span>
+    </div>
+    <p class="cover-desc">A product document proposing a portfolio-level contract intelligence layer built on top of Signit's existing CLM. Covers problem analysis, solution design, user flows, AI architecture, and next-phase priorities.</p>
+  </div>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#problem-analysis">Problem Analysis</a></li>
+      <li><a href="#solution-overview">Solution Overview</a></li>
+      <li><a href="#user-flows">User Flows and Interaction Model</a></li>
+      <li><a href="#ai-architecture">AI Architecture (Conceptual)</a></li>
+      <li><a href="#more-time">What We Would Do with More Time</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </nav>
+
+  <!-- Section 01: Problem Analysis -->
+  <section class="section" id="problem-analysis">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Problem Analysis</h2>
+    </div>
+
+    <h3>The surface problem vs. the real problem</h3>
+    <p>Enterprise contract management tools, including Signit's existing CLM, solve the per-contract problem well: store it, track its renewal date, flag its key clauses. What they do not solve is the portfolio problem. No tool today can answer: <em>which of our 180 vendor contracts expose us to liability above our insurance threshold?</em> or <em>do our data processing agreements conflict with our new PDPL obligations?</em> That question requires reasoning across documents simultaneously, not managing them one at a time.</p>
+    <p>The real problem is not that organizations cannot find their contracts. It is that no one in the organization has a coherent picture of what they have collectively committed to, and by the time someone needs that picture, the obligation has already been triggered.</p>
+
+    <h3>Three root causes</h3>
+    <p><strong>Contracts are static artifacts.</strong> Signing ends the workflow. After execution, the document exits every operational system and lives in a shared drive, disconnected from the work it governs. No one reads it again until something goes wrong.</p>
+    <p><strong>Obligation awareness has no organizational owner.</strong> Legal drafts the contract. Procurement manages the vendor relationship. Finance processes the invoice. Nobody owns the question: <em>what did we commit to, and is it happening?</em> That gap is structural, not a tooling failure, which is why better search does not fix it.</p>
+    <p><strong>Context does not travel with the obligation.</strong> Even when Legal has read the contract, the person who needs to act (the procurement manager scheduling a renegotiation, the finance lead flagging an invoice) has no access to the clause that governs their decision at the moment they need it.</p>
+
+    <h3>Persona-level failure modes</h3>
+    <p><strong>Legal counsel:</strong> Reactive by default. Pulled in after exposure is triggered, not before. The bottleneck is cross-contract comparison: spotting systemic clause patterns across a portfolio of 100+ documents is beyond any manual review cadence.</p>
+    <p><strong>Procurement and operations manager:</strong> Gets renewal reminders today. Does not get renegotiation intelligence. Knowing a contract renews in 60 days is useful. Knowing that there is $2.1M in spend concentration with that vendor across four contracts, two expiring in the same window, with a 90 day exit clause, means there is leverage. That does not exist anywhere in the current workflow.</p>
+    <p><strong>Executive (CFO/COO):</strong> Has no system of record for contractual obligations at the portfolio level. Capital allocation decisions are made without knowing what existing contracts constrain or commit. In the Saudi market specifically, PDPL compliance exposure across data processing agreements and Vision 2030 contractual commitments represent a class of executive-level risk with no current visibility.</p>
+
+    <div class="callout">
+      <strong>Core insight</strong><br/>
+      All three personas need cross-portfolio visibility, at different levels of abstraction: Legal wants clause-level patterns, Procurement wants vendor-level intelligence, the Executive wants portfolio-level financial and risk posture. The same underlying data, three lenses. That is the design challenge and the argument for one product serving all three.
+    </div>
+
+    <h3>Assumptions</h3>
+    <ul>
+      <li>Target segment is mid-market enterprise: 50 to 500 active contracts. Below that threshold, a spreadsheet is sufficient. Above it, incumbent CLM platforms are typically already in place.</li>
+      <li>Contracts are primarily in Arabic and English, in PDF or Word format, stored in Google Drive, SharePoint, or Signit's vault.</li>
+      <li>AI extraction confidence on structured clauses (dates, payment terms, liability caps, notice periods) is production-ready with current models. Freeform obligation extraction carries higher uncertainty, addressed in Section 4.</li>
+      <li>Signit's 700+ existing customers, spanning government, financial services, and healthcare, represent the primary adoption base.</li>
+    </ul>
+  </section>
+
+  <!-- Section 02: Solution Overview -->
+  <section class="section" id="solution-overview">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Solution Overview</h2>
+    </div>
+
+    <h3>What we are building</h3>
+    <p>Signit Intelligence is a portfolio-level contract awareness layer that sits on top of Signit's existing CLM. It does not replace contract storage, authoring, or e-signatures. It makes the organization's signed contracts collectively legible, for the first time, to the people who need to act on them.</p>
+    <p>The product is built around a single organizing idea: the Obligation Timeline. Instead of a contract database you search when you remember to, the timeline is a living, AI-maintained view of what the organization has committed to, ordered by when action is required. Contracts are the source. The timeline is what people use.</p>
+
+    <h3>The core thesis</h3>
+    <p>Every existing tool in this space, including Signit's current CLM, is built around the document as the primary object. Find the contract, open it, read the clause. That interaction model assumes the user already knows what to look for and when to look.</p>
+    <p>The shift we are making: the portfolio is the primary object. The system reasons across all contracts simultaneously and surfaces what matters before the user thinks to ask. This is not a search improvement. It is a change in who initiates the interaction: today the user pulls information, with Signit Intelligence the system pushes it.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 680 280" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <!-- Intelligence Layer -->
+        <rect x="1" y="1" width="678" height="158" rx="6" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1.5"/>
+        <text x="16" y="22" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">SIGNIT INTELLIGENCE</text>
+        <rect x="600" y="8" width="70" height="20" rx="3" fill="#111827"/>
+        <text x="635" y="22" font-size="9" fill="#ffffff" font-weight="600" letter-spacing="0.08em" text-anchor="middle">NEW</text>
+        <!-- Legal card -->
+        <rect x="16" y="32" width="202" height="114" rx="4" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="117" y="68" font-size="12" fill="#111827" font-weight="600" text-anchor="middle">Legal View</text>
+        <text x="117" y="88" font-size="11" fill="#6b7280" text-anchor="middle">Clause pattern analysis</text>
+        <text x="117" y="104" font-size="11" fill="#6b7280" text-anchor="middle">across the portfolio</text>
+        <!-- Procurement card -->
+        <rect x="239" y="32" width="202" height="114" rx="4" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="340" y="68" font-size="12" fill="#111827" font-weight="600" text-anchor="middle">Procurement View</text>
+        <text x="340" y="88" font-size="11" fill="#6b7280" text-anchor="middle">Vendor intelligence and</text>
+        <text x="340" y="104" font-size="11" fill="#6b7280" text-anchor="middle">renegotiation signals</text>
+        <!-- Executive card -->
+        <rect x="462" y="32" width="202" height="114" rx="4" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="563" y="68" font-size="12" fill="#111827" font-weight="600" text-anchor="middle">Executive View</text>
+        <text x="563" y="88" font-size="11" fill="#6b7280" text-anchor="middle">Portfolio posture and</text>
+        <text x="563" y="104" font-size="11" fill="#6b7280" text-anchor="middle">financial exposure</text>
+        <!-- Connector -->
+        <line x1="340" y1="160" x2="340" y2="195" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="334,191 340,199 346,191" fill="#d1d5db"/>
+        <!-- CLM Layer -->
+        <rect x="1" y="199" width="678" height="70" rx="6" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+        <text x="16" y="220" font-size="10" fill="#9ca3af" font-weight="600" letter-spacing="0.08em">SIGNIT CLM</text>
+        <rect x="583" y="207" width="86" height="20" rx="3" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="626" y="221" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.08em" text-anchor="middle">EXISTING</text>
+        <text x="175" y="248" font-size="11" fill="#9ca3af" text-anchor="middle">Contract Storage</text>
+        <circle cx="260" cy="244" r="2" fill="#d1d5db"/>
+        <text x="340" y="248" font-size="11" fill="#9ca3af" text-anchor="middle">Obligations</text>
+        <circle cx="420" cy="244" r="2" fill="#d1d5db"/>
+        <text x="505" y="248" font-size="11" fill="#9ca3af" text-anchor="middle">e-Signatures</text>
+      </svg>
+      <p class="figure-caption">Signit Intelligence sits as a portfolio-level layer above the existing CLM, with role-specific views on the same underlying contract data.</p>
+    </div>
+
+    <h3>Three lenses, one data model</h3>
+    <p>The same extracted contract data serves all three personas through role-specific views. No separate products, no duplicate data pipelines.</p>
+    <p>The <strong>Legal view</strong> surfaces clause-level patterns across the portfolio: deviations from standard indemnification language, liability caps below a defined threshold, PDPL-relevant data processing obligations, and concentration of unfavorable terms by vendor category. Legal sets the parameters; the system monitors continuously.</p>
+    <p>The <strong>Procurement view</strong> organizes the portfolio by vendor relationship. For each vendor, it shows total spend commitment across all active contracts, upcoming renewal windows, notice period deadlines, and an AI-generated renegotiation signal: whether the organization has leverage based on spend concentration, expiry alignment, and exit clause terms. The goal is to turn a renewal reminder into a negotiation brief.</p>
+    <p>The <strong>Executive view</strong> is a portfolio posture digest, not a dashboard. It answers four questions: what are our total contractual financial commitments over the next 12 months, where is our concentration risk, what regulatory exposure exists across the portfolio, and what decisions require C-suite attention in the next 90 days. Updated weekly, delivered as a structured brief rather than a live interface the CFO needs to learn to navigate.</p>
+
+    <h3>What we deliberately left out</h3>
+    <p>Contract authoring, redlining, and e-signatures are out of scope. Signit already owns this layer and it is a strength. Rebuilding it would dilute the product's identity and misallocate engineering effort.</p>
+    <p>A chat-only interface is out of scope. Natural language querying is one interaction mode within the product, not the entire surface. A CFO should not need to know how to phrase a prompt to get their weekly posture brief.</p>
+
+    <h3>Rollout approach</h3>
+    <p>Phase 1 ships to a pilot cohort of 10 to 15 existing Signit enterprise customers before general availability. The Obligation Timeline and the three persona views are the primary surfaces under evaluation. Gate metrics for broader rollout are weekly active use across all three target personas and a false positive rate below 15% on the clause sweep within the first 30 days of use.</p>
+  </section>
+
+  <!-- Section 03: User Flows -->
+  <section class="section" id="user-flows">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>User Flows and Interaction Model</h2>
+    </div>
+
+    <h3>Flow 1: Procurement and the renegotiation brief</h3>
+    <p>A vendor contract entering the 90-day renewal window triggers an AI-generated intelligence card, turning a routine reminder into a structured negotiation brief the procurement manager can act on immediately.</p>
+    <div class="figure">
+      <svg viewBox="0 0 680 155" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <text x="5" y="16" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">PROCUREMENT</text>
+        <rect x="5" y="25" width="145" height="110" rx="5" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="13" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">01  TRIGGER</text>
+        <text x="13" y="68" font-size="11.5" fill="#111827" font-weight="600">Renewal detected</text>
+        <text x="13" y="86" font-size="10" fill="#6b7280">Contract entering</text>
+        <text x="13" y="100" font-size="10" fill="#6b7280">90-day renewal window</text>
+        <line x1="152" y1="80" x2="172" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="168,76 176,80 168,84" fill="#d1d5db"/>
+        <rect x="178" y="25" width="145" height="110" rx="5" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="186" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">02  SYSTEM</text>
+        <text x="186" y="68" font-size="11.5" fill="#111827" font-weight="600">Intelligence card</text>
+        <text x="186" y="86" font-size="10" fill="#6b7280">Spend, expiry alignment,</text>
+        <text x="186" y="100" font-size="10" fill="#6b7280">leverage signal surfaced</text>
+        <line x1="325" y1="80" x2="345" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="341,76 349,80 341,84" fill="#d1d5db"/>
+        <rect x="351" y="25" width="145" height="110" rx="5" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="359" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">03  USER</text>
+        <text x="359" y="68" font-size="11.5" fill="#111827" font-weight="600">Reviews and adjusts</text>
+        <text x="359" y="86" font-size="10" fill="#6b7280">Corrects figures, adds</text>
+        <text x="359" y="100" font-size="10" fill="#6b7280">notes, exports brief</text>
+        <line x1="498" y1="80" x2="518" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="514,76 522,80 514,84" fill="#d1d5db"/>
+        <rect x="524" y="25" width="145" height="110" rx="5" fill="#f0fdf4" stroke="#d1fae5" stroke-width="1"/>
+        <text x="532" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">04  OUTCOME</text>
+        <text x="532" y="68" font-size="11.5" fill="#111827" font-weight="600">Negotiation brief</text>
+        <text x="532" y="86" font-size="10" fill="#6b7280">Renewal becomes a</text>
+        <text x="532" y="100" font-size="10" fill="#6b7280">managed renegotiation</text>
+      </svg>
+    </div>
+
+    <h3>Flow 2: Legal and the clause sweep</h3>
+    <p>A new compliance requirement triggers a portfolio-wide clause sweep. Legal gets a ranked, reviewable list of affected contracts with source citations and confidence indicators, and can build a remediation workplan without opening a single PDF manually.</p>
+    <div class="figure">
+      <svg viewBox="0 0 680 155" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <text x="5" y="16" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">LEGAL COUNSEL</text>
+        <rect x="5" y="25" width="145" height="110" rx="5" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="13" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">01  TRIGGER</text>
+        <text x="13" y="68" font-size="11.5" fill="#111827" font-weight="600">Compliance update</text>
+        <text x="13" y="86" font-size="10" fill="#6b7280">New PDPL guidance</text>
+        <text x="13" y="100" font-size="10" fill="#6b7280">requires portfolio review</text>
+        <line x1="152" y1="80" x2="172" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="168,76 176,80 168,84" fill="#d1d5db"/>
+        <rect x="178" y="25" width="145" height="110" rx="5" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="186" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">02  SYSTEM</text>
+        <text x="186" y="68" font-size="11.5" fill="#111827" font-weight="600">Clause sweep results</text>
+        <text x="186" y="86" font-size="10" fill="#6b7280">Ranked list with excerpts,</text>
+        <text x="186" y="100" font-size="10" fill="#6b7280">sources, confidence score</text>
+        <line x1="325" y1="80" x2="345" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="341,76 349,80 341,84" fill="#d1d5db"/>
+        <rect x="351" y="25" width="145" height="110" rx="5" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="359" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">03  USER</text>
+        <text x="359" y="68" font-size="11.5" fill="#111827" font-weight="600">Reviews and triages</text>
+        <text x="359" y="86" font-size="10" fill="#6b7280">Confirms flags, marks</text>
+        <text x="359" y="100" font-size="10" fill="#6b7280">false positives, escalates</text>
+        <line x1="498" y1="80" x2="518" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="514,76 522,80 514,84" fill="#d1d5db"/>
+        <rect x="524" y="25" width="145" height="110" rx="5" fill="#f0fdf4" stroke="#d1fae5" stroke-width="1"/>
+        <text x="532" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">04  OUTCOME</text>
+        <text x="532" y="68" font-size="11.5" fill="#111827" font-weight="600">Remediation plan</text>
+        <text x="532" y="86" font-size="10" fill="#6b7280">Workplan with owners</text>
+        <text x="532" y="100" font-size="10" fill="#6b7280">and target dates created</text>
+      </svg>
+    </div>
+
+    <h3>Flow 3: Executive and the weekly posture brief</h3>
+    <p>Every Monday morning, the CFO receives a structured brief covering financial obligations, concentration risks, regulatory flags, and pending decisions, without logging in or requesting a report.</p>
+    <div class="figure">
+      <svg viewBox="0 0 680 155" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <text x="5" y="16" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">EXECUTIVE (CFO/COO)</text>
+        <rect x="5" y="25" width="145" height="110" rx="5" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="13" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">01  TRIGGER</text>
+        <text x="13" y="68" font-size="11.5" fill="#111827" font-weight="600">Monday morning</text>
+        <text x="13" y="86" font-size="10" fill="#6b7280">Automated weekly</text>
+        <text x="13" y="100" font-size="10" fill="#6b7280">brief generated</text>
+        <line x1="152" y1="80" x2="172" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="168,76 176,80 168,84" fill="#d1d5db"/>
+        <rect x="178" y="25" width="145" height="110" rx="5" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="186" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">02  SYSTEM</text>
+        <text x="186" y="68" font-size="11.5" fill="#111827" font-weight="600">Posture brief delivered</text>
+        <text x="186" y="86" font-size="10" fill="#6b7280">Obligations, risks, flags,</text>
+        <text x="186" y="100" font-size="10" fill="#6b7280">decisions due surfaced</text>
+        <line x1="325" y1="80" x2="345" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="341,76 349,80 341,84" fill="#d1d5db"/>
+        <rect x="351" y="25" width="145" height="110" rx="5" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+        <text x="359" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">03  USER</text>
+        <text x="359" y="68" font-size="11.5" fill="#111827" font-weight="600">Reads and delegates</text>
+        <text x="359" y="86" font-size="10" fill="#6b7280">5-minute read, clicks</text>
+        <text x="359" y="100" font-size="10" fill="#6b7280">through to detail</text>
+        <line x1="498" y1="80" x2="518" y2="80" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="514,76 522,80 514,84" fill="#d1d5db"/>
+        <rect x="524" y="25" width="145" height="110" rx="5" fill="#f0fdf4" stroke="#d1fae5" stroke-width="1"/>
+        <text x="532" y="46" font-size="9" fill="#9ca3af" font-weight="600" letter-spacing="0.07em">04  OUTCOME</text>
+        <text x="532" y="68" font-size="11.5" fill="#111827" font-weight="600">Standing visibility</text>
+        <text x="532" y="86" font-size="10" fill="#6b7280">Portfolio exposure known</text>
+        <text x="532" y="100" font-size="10" fill="#6b7280">without requesting report</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Section 04: AI Architecture -->
+  <section class="section" id="ai-architecture">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>AI Architecture (Conceptual)</h2>
+    </div>
+
+    <h3>The capability stack</h3>
+    <p>The AI pipeline operates across three layers, each with distinct capability requirements and confidence characteristics.</p>
+    <p><strong>Extraction layer.</strong> Structured data extraction from PDF and Word documents: parties, effective dates, payment terms, liability caps, notice periods, auto-renewal conditions, and governing law. This is well within current LLM capability at high confidence for well-structured contracts. Arabic and English are both handled natively. Output is a normalized contract data model that feeds every downstream capability. This layer runs once on ingest and re-runs on document updates.</p>
+    <p><strong>Reasoning layer.</strong> Cross-contract analysis: clause comparison across the portfolio, spend aggregation by vendor, renegotiation leverage signal generation, and regulatory flag detection against a defined ruleset (PDPL obligations, SAMA requirements, standard market terms). Reasoning operates over the extracted structured data, not raw documents. Confidence is materially higher at this layer because the inputs are clean and normalized rather than dense unstructured legal language.</p>
+    <p><strong>Retrieval is structured-query-first.</strong> Cross-contract questions ("contracts with liability cap below SAR 1M, expiring in 90 days") run as deterministic queries over the normalized contract data model. Vector retrieval is reserved for clause-text grounding inside citations, where similarity over the original clause text proves out the link between an extracted value and its source language. This split keeps the high-leverage portfolio queries reproducible and auditable, while still letting users pivot back to the exact passage.</p>
+    <p><strong>Synthesis layer.</strong> Generating the outputs users see: the vendor intelligence card, the clause sweep results, the executive posture brief. All synthesis is grounded in extracted source data. Every generated statement carries a citation back to the originating clause and document. The system never produces a summary that cannot be traced to a specific source.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 600 380" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <!-- Block 1: Extraction -->
+        <rect x="0" y="0" width="600" height="100" rx="6" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1.5"/>
+        <rect x="0" y="0" width="4" height="100" rx="2" fill="#111827"/>
+        <text x="20" y="24" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">01  EXTRACTION LAYER</text>
+        <text x="20" y="50" font-size="13" fill="#111827" font-weight="600">Document ingestion and structured data extraction</text>
+        <text x="20" y="70" font-size="11" fill="#6b7280">Ingests PDF and Word documents. Outputs parties, dates, payment terms, liability caps, notice periods.</text>
+        <text x="20" y="88" font-size="11" fill="#9ca3af">Confidence: High on well-structured clauses</text>
+        <!-- Arrow 1 -->
+        <line x1="300" y1="102" x2="300" y2="130" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="294,126 300,138 306,126" fill="#d1d5db"/>
+        <!-- Block 2: Reasoning -->
+        <rect x="0" y="140" width="600" height="100" rx="6" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1.5"/>
+        <rect x="0" y="140" width="4" height="100" rx="2" fill="#111827"/>
+        <text x="20" y="164" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">02  REASONING LAYER</text>
+        <text x="20" y="190" font-size="13" fill="#111827" font-weight="600">Cross-contract analysis and portfolio intelligence</text>
+        <text x="20" y="210" font-size="11" fill="#6b7280">Clause comparison, spend aggregation, leverage signals, regulatory flag detection.</text>
+        <text x="20" y="228" font-size="11" fill="#9ca3af">Confidence: High (operates on clean structured inputs)</text>
+        <!-- Arrow 2 -->
+        <line x1="300" y1="242" x2="300" y2="270" stroke="#d1d5db" stroke-width="1.5"/>
+        <polygon points="294,266 300,278 306,266" fill="#d1d5db"/>
+        <!-- Block 3: Synthesis -->
+        <rect x="0" y="280" width="600" height="100" rx="6" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1.5"/>
+        <rect x="0" y="280" width="4" height="100" rx="2" fill="#111827"/>
+        <text x="20" y="304" font-size="10" fill="#6b7280" font-weight="600" letter-spacing="0.08em">03  SYNTHESIS LAYER</text>
+        <text x="20" y="330" font-size="13" fill="#111827" font-weight="600">User-facing outputs with source citations</text>
+        <text x="20" y="350" font-size="11" fill="#6b7280">Generates renegotiation briefs, clause sweep results, and executive posture digests.</text>
+        <text x="20" y="368" font-size="11" fill="#9ca3af">Every statement grounded in extracted source data</text>
+      </svg>
+      <p class="figure-caption">The three-layer AI pipeline. Confidence improves at each layer as inputs become progressively cleaner and more structured.</p>
+    </div>
+
+    <h3>Handling confidence and uncertainty</h3>
+    <p>Every AI-extracted value carries a confidence indicator surfaced in the UI: high, medium, or low. Low-confidence extractions are flagged for human review before entering any downstream output. The system does not silently present uncertain data as fact. Where confidence is low, the original document is surfaced alongside the extraction so the user can verify directly.</p>
+    <p>The clause sweep in Flow 2 is designed around the expectation of false positives. The confirm, mark as false positive, and escalate actions are not just UX affordances: they are the feedback loop that improves extraction accuracy over time. Each correction is logged against the contract type and clause category, informing future extraction runs.</p>
+
+    <h3>The failure mode that matters most</h3>
+    <p>The most consequential failure is not a wrong answer but a missing one: a clause the system did not extract that later becomes a liability. We address this with a document completeness score. If key expected fields (liability cap, termination clause, governing law, notice period) are absent from an extraction, the contract is flagged as incomplete rather than silently passed through as fully processed. Incomplete contracts are surfaced in a review queue, not treated as clean data.</p>
+
+    <div class="callout">
+      <strong>Design principle</strong><br/>
+      The AI's job is to reduce the search space, not to make the decision. Every output the system generates is presented as a starting point for human review, not a conclusion. Confidence indicators, source citations, and correction workflows are not edge-case features: they are the trust model the product is built on.
+    </div>
+
+    <h3>Metrics and evaluation</h3>
+    <p>Extraction quality is measured using F1-score, the standard metric for legal named entity recognition, which balances precision (accuracy of what the system flags) and recall (completeness of what it catches). Industry benchmarks for specialized legal AI set 90 to 95% precision on standard structured fields (dates, parties, payment amounts) and 75 to 90% on complex clause extraction. Phase 1 targets 93% F1 on standard fields at launch, with a floor of 80% on complex clause types before any extraction enters a downstream output.</p>
+    <p>Confidence routing uses numeric thresholds, not subjective labels. High-precision mode accepts extractions above 0.95 confidence; high-recall mode accepts above 0.70. Extractions below the active threshold are flagged for human review rather than passed downstream. The mapping of confidence score to actual accuracy is validated quarterly against human-reviewed samples: a high-confidence extraction that is frequently corrected signals a miscalibrated model requiring targeted retraining.</p>
+    <p>Hallucination rate is tracked as a first-class production metric. General-purpose language models baseline at 0.7 to 1.3% on legal tasks; specialized legal models achieve approximately 0.2%. Phase 1 targets below 0.5% for the extraction layer, measured via LLM-as-judge evaluation at scale with human spot-checks on a stratified random sample. Manual review of every extraction does not scale; secondary model evaluation with human arbitration on disputed cases is the practical production approach.</p>
+    <p>Ground truth annotation follows a three to five annotator methodology using legal SMEs, with inter-annotator reliability tracked and arbitrated before any labeled data enters training or evaluation sets. Annotated samples cover 5 to 15% of the total corpus, stratified by contract type and complexity rather than drawn from the easiest documents. Ground truth is versioned with rollback capability and a full audit trail.</p>
+    <p>One failure mode documented consistently across legal AI platforms deserves explicit handling: negated clauses. Constructions like "the contractor shall not be liable for..." are frequently misread as affirmative obligations. The extraction layer flags all negated obligation clauses for mandatory human review regardless of confidence score. This is treated as a known systematic failure point, not an edge case.</p>
+    <p>User correction data from the clause sweep workflow (confirm, false positive, escalate) feeds back into model evaluation on a rolling basis. False positive rate by clause category and correction velocity over time are the two primary feedback loop metrics. Correction velocity should decrease as the model learns. A category with persistently high false positive rate triggers a targeted retraining cycle rather than a blanket confidence threshold adjustment.</p>
+
+    <h3>Regulatory grounding</h3>
+    <p>The EU AI Act, enforceable from August 2026, classifies AI systems used in legal document analysis as high-risk where outputs influence significant decisions. Signit Intelligence is designed to comply: human review gates at every output layer, full audit trails on AI-extracted data, and documented data provenance from source clause to user-facing output. NIST AI Risk Management Framework (GOVERN 1.1) and ISO 42001 provide the governance scaffolding for international enterprise customers.</p>
+    <p>For Signit's Saudi market, SDAIA's National AI Ethics Principles (transparency, explicability, human oversight) map directly to the same design decisions: no AI output reaches a user without a source citation, and every extraction has a human correction pathway. Compliance is not a constraint on the architecture; it is the architecture.</p>
+  </section>
+
+  <!-- Section 05: What We Would Do with More Time -->
+  <section class="section" id="more-time">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>What We Would Do with More Time</h2>
+    </div>
+
+    <p>These three initiatives are sequenced, not parallel. Obligation monitoring builds on the extraction layer from Phase 1 and should begin once extraction quality is validated in production. Counterparty benchmarking requires a sufficient corpus of customer contracts and is a standalone data initiative that can run in parallel with obligation monitoring once Phase 1 is stable. Portfolio health scoring depends on both: it needs reliable extraction data and, ideally, benchmark context to make the scores meaningful. It is the last of the three to ship.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 510" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, sans-serif; display: block;">
+        <!-- Quadrant backgrounds -->
+        <rect x="60" y="20" width="275" height="180" fill="#f0fdf4"/>
+        <rect x="335" y="20" width="275" height="180" fill="#eff6ff"/>
+        <rect x="60" y="200" width="275" height="180" fill="#f9fafb"/>
+        <rect x="335" y="200" width="275" height="180" fill="#fef2f2"/>
+        <!-- Chart border -->
+        <rect x="60" y="20" width="550" height="360" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+        <!-- Dividing lines -->
+        <line x1="335" y1="20" x2="335" y2="380" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="60" y1="200" x2="610" y2="200" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- Quadrant labels -->
+        <text x="80" y="48" font-size="11" fill="#16a34a" font-weight="600">Quick Win</text>
+        <text x="355" y="48" font-size="11" fill="#2563eb" font-weight="600">Strategic</text>
+        <text x="80" y="226" font-size="11" fill="#6b7280" font-weight="600">Consider</text>
+        <text x="355" y="226" font-size="11" fill="#dc2626" font-weight="600">Avoid</text>
+        <!-- Y axis -->
+        <text x="28" y="200" font-size="11" fill="#6b7280" font-weight="500" text-anchor="middle" transform="rotate(-90, 28, 200)">Impact</text>
+        <text x="44" y="28" font-size="10" fill="#9ca3af" text-anchor="middle">High</text>
+        <text x="44" y="378" font-size="10" fill="#9ca3af" text-anchor="middle">Low</text>
+        <!-- X axis -->
+        <text x="335" y="406" font-size="11" fill="#6b7280" font-weight="500" text-anchor="middle">Effort</text>
+        <text x="64" y="406" font-size="10" fill="#9ca3af" text-anchor="start">Low</text>
+        <text x="606" y="406" font-size="10" fill="#9ca3af" text-anchor="end">High</text>
+        <!-- Item 1: Obligation Monitoring -->
+        <circle cx="450" cy="85" r="20" fill="#111827"/>
+        <text x="450" y="91" font-size="13" fill="#ffffff" font-weight="600" text-anchor="middle">1</text>
+        <!-- Item 2: Counterparty Benchmarking -->
+        <circle cx="555" cy="135" r="20" fill="#111827"/>
+        <text x="555" y="141" font-size="13" fill="#ffffff" font-weight="600" text-anchor="middle">2</text>
+        <!-- Item 3: Portfolio Health Scoring -->
+        <circle cx="285" cy="230" r="20" fill="#111827"/>
+        <text x="285" y="236" font-size="13" fill="#ffffff" font-weight="600" text-anchor="middle">3</text>
+        <!-- Legend -->
+        <circle cx="80" cy="438" r="10" fill="#111827"/>
+        <text x="97" y="443" font-size="12" fill="#374151">1  Obligation Monitoring</text>
+        <circle cx="80" cy="466" r="10" fill="#111827"/>
+        <text x="97" y="471" font-size="12" fill="#374151">2  Counterparty Benchmarking</text>
+        <circle cx="340" cy="438" r="10" fill="#111827"/>
+        <text x="357" y="443" font-size="12" fill="#374151">3  Portfolio Health Scoring</text>
+      </svg>
+      <p class="figure-caption">Items 1 and 2 run sequentially then in parallel once Phase 1 is stable. Item 3 follows after both are validated.</p>
+    </div>
+
+    <h3>Obligation monitoring with proactive breach detection</h3>
+    <p>Phase 1 surfaces what was agreed to. Phase 2 adds the ability to detect when obligations are not being met: payment schedules not followed, SLA terms not tracked, deliverable deadlines approaching without confirmation of completion. This requires integrating with finance systems (ERP, accounts payable) and project tracking tools to close the loop between contractual commitment and operational reality. It is the highest-complexity item on this list and the highest-value one for the legal and procurement personas. A contract intelligence system that can only tell you what was agreed, but not whether it is happening, is still half a solution.</p>
+
+    <h3>Counterparty benchmarking</h3>
+    <p>The renegotiation leverage signal in Phase 1 is built entirely from internal data: your spend, your contracts, your exit terms. The more powerful version adds market context. How do your liability caps, payment terms, and termination clauses compare to market standard for your vendor category and contract size? Procurement walking into a renegotiation knowing that their liability cap is twice the market norm for a SaaS agreement of this size has a materially different conversation than one relying on instinct alone.</p>
+    <p>Building this requires an anonymized benchmark dataset derived from Signit's contract corpus across its 700+ customer organizations. The data governance and privacy work is substantial and must be designed carefully. But if executed well, it is a genuine competitive moat: no point solution can replicate it without the same volume of signed contracts flowing through their platform.</p>
+
+    <h3>Portfolio health scoring</h3>
+    <p>A single score per contract and per vendor relationship summarizing risk exposure, compliance status, and upcoming obligation density. The score feeds a portfolio heat map for the executive view: at a glance, which vendor relationships are healthy, which are elevated risk, and which require immediate attention.</p>
+    <p>This is straightforward to display and genuinely difficult to get right. Defining what "health" means across contract types (a healthy SaaS agreement looks different from a healthy construction subcontract) and making that definition defensible to a legal team is a multi-month calibration effort. It belongs in Phase 2 rather than Phase 1 precisely because trust in the underlying extraction model needs to be established first. A health score built on uncertain extractions is worse than no score at all.</p>
+  </section>
+
+  <!-- Section 06: Summary -->
+  <section class="section" id="summary">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>Summary</h2>
+    </div>
+
+    <p>Three points to take away from this document:</p>
+
+    <h3>Angle</h3>
+    <p>Today's contract tools, including Signit's existing CLM, treat the <strong>document</strong> as the primary object. Signit Intelligence treats the <strong>portfolio</strong> as the primary object: the system reasons across all signed contracts simultaneously and surfaces what matters before the user thinks to ask. This is the shift in who initiates the interaction, not just a search improvement.</p>
+
+    <h3>Primary surface</h3>
+    <p>A live <strong>Obligation Timeline</strong> orders the portfolio by when action is required, with a <strong>persona lens</strong> (Legal, Procurement, Executive) that re-prioritizes the same data without forking the product into three. One data model, three lenses.</p>
+
+    <h3>AI trust model</h3>
+    <p>Every AI-derived value carries clause-level provenance: clause reference, source quote, confidence score, and derivation. Low-confidence extractions, incomplete documents, and negated-clause constructions route to a Human Review Queue rather than passing silently into downstream outputs. The AI's job is to reduce the search space, not to make the decision.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>Post-Signature Contract Intelligence: Signit AI PM Case Study</span>
+    <span>May 3, 2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
